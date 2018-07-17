@@ -38,7 +38,13 @@ class ViewController: UIViewController {
     }
 
     @objc func letterTapped(btn: UIButton) {
-        
+        /* Get text from title label of button that was tapped and
+         append to current text of answer text field. */
+        currentAnswer.text = currentAnswer.text! + btn.titleLabel!.text!
+        // Append button to 'activatedButtons' array.
+        activatedButtons.append(btn)
+        // Hide button
+        btn.isHidden = true
     }
     
     func loadLevel() {
@@ -100,9 +106,64 @@ class ViewController: UIViewController {
     }
     
     @IBAction func submitTapped(_ sender: Any) {
+        /* Using 'index(of:)' to loop through the 'solutionPosition'
+         which will tell us where each letter is in the array. */
+        if let solutionPosition = solutions.index(of: currentAnswer.text!) {
+            activatedButtons.removeAll()
+            
+            // Separate 'answerLabel' text components by the '\n'/line break character
+            var splitAnswers = answersLabel.text!.components(separatedBy: "\n")
+            // Replace the line at the 'solutionPosition' with the solution itself
+            splitAnswers[solutionPosition] = currentAnswer.text!
+            // Rejoin answers label back together
+            answersLabel.text = splitAnswers.joined(separator: "\n")
+            
+            // Clear the 'currentAnswer.text' label
+            currentAnswer.text = ""
+            // Increment score
+            score += 1
+            
+            /* Using the modulo operator to make sure that the player
+             has answered all 7 words correctly. Remember the %/modulo is
+             used to get the remainder. So if score = 7 and you are
+             saying 'score % 7 == 0' then you know they answered all
+             correctly as 7 divided by 7 leaves a remainder of 0! */
+            if score % 7 == 0 {
+                // Create a UIAlertController to prompt player about next level
+                let ac = UIAlertController(title: "Well done!", message: "Are you ready for the next level?", preferredStyle: .alert)
+                // Add action/button to the AC
+                ac.addAction(UIAlertAction(title: "Let's go!", style: .default, handler: levelUp))
+                // Present and animate the ac on the view controller modally
+                present(ac, animated: true)
+            }
+            
+        }
     }
     
     @IBAction func clearTapped(_ sender: Any) {
+        // Clears the 'currentAnswer' text
+        currentAnswer.text = " "
+        
+        // Loops through 'activatedButtons' array and unhides buttons
+        for btn in activatedButtons {
+            btn.isHidden = false
+        }
+        
+        // Removes buttons from array
+        activatedButtons.removeAll()
+    }
+    
+    func levelUp(action: UIAlertAction) {
+        // Increase level by 1
+        level += 1
+        // Remove all elements from the 'solutions' array
+        solutions.removeAll(keepingCapacity: true)
+        
+        loadLevel()
+        
+        for btn in letterButtons {
+            btn.isHidden = false
+        }
     }
     
 
