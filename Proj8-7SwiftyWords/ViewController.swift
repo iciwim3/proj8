@@ -32,6 +32,9 @@ class ViewController: UIViewController {
             letterButtons.append(btn)
             btn.addTarget(self, action: #selector(letterTapped), for: .touchUpInside)
         }
+        
+        loadLevel()
+        
     }
 
     @objc func letterTapped(btn: UIButton) {
